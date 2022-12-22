@@ -17,13 +17,45 @@ function Book(name, author) {
 function addBookToLibrary(name, author) {
   const book = new Book(name, author);
   myLibrary.push(book);
-  const div = library.appendChild(document.createElement('div'));
-  div.innerHTML = `${myLibrary.slice(-1)[0].name} ${myLibrary.slice(-1)[0].author}`;
+  console.log(myLibrary)
 }
 
-for (const book in myLibrary) {
-  const div = library.appendChild(document.createElement('div'));
-  div.innerHTML = `${myLibrary[book].name} ${myLibrary[book].author}`;
+function removeLibraryContent() {
+  while (library.firstChild) {
+    library.removeChild(library.firstChild);
+  }
+}
+
+function addRemoveButton(book, div) {
+  const button = document.createElement('button');
+  button.innerHTML = 'Remove';
+  button.classList.add('book', 'remove');
+  button.dataset.arrayRef = `${myLibrary.indexOf(myLibrary[book])}`;
+  div.appendChild(button);
+}
+
+function addLibraryContent() {
+  for (const book in myLibrary) {
+    const div = library.appendChild(document.createElement('div'));
+    div.textContent = `${myLibrary[book].name} ${myLibrary[book].author}`;
+    addRemoveButton(book, div);
+}}
+
+
+function listenRemoveButton() {
+  const booksNodelist = document.querySelectorAll('[data-array-ref]');
+  const booksArray = [...booksNodelist];
+  booksArray.forEach((button) => button.addEventListener('click', (e) => {
+    console.log(e.target.dataset.arrayRef);
+    myLibrary.splice([`${e.target.dataset.arrayRef}`], 1);
+    refreshLibraryContent();
+  }));
+}
+
+function refreshLibraryContent() {
+  removeLibraryContent();
+  addLibraryContent();
+  listenRemoveButton();
 }
 
 submit.addEventListener('click', () => {
@@ -31,5 +63,7 @@ submit.addEventListener('click', () => {
   const name = formName.value;
   const author = formAuthor.value;
   addBookToLibrary(name, author);
+  refreshLibraryContent();
 });
 
+refreshLibraryContent();
